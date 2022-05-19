@@ -1,22 +1,18 @@
 # GLOBAL NETWORK - Optionally created if it is not supplied as variable
 resource "awscc_networkmanager_global_network" "global_network" {
-    count = try(var.global_network.id, false) ? 1 : 0
+    count = var.global_network.id == null ? 1 : 0
     
-    description = "Global Network - ${var.global_network.name}"
+    description = var.global_network.description
 
-    tags = concat(module.tags.tags,
-    [{
-      key   = "Name"
-      value = var.global_network.name
-    }]
-  )
+    tags = module.tags.tags
 }
 
 # CORE NETWORK
 resource "awscc_networkmanager_core_network" "core_network" {
-    description = "Core Network - ${var.core_network.name}"
-    global_network_id = try(var.global_network.id, false) ? var.global_network.id : awscc_networkmanager_global_network.global_network.id
+    description = var.core_network.description
+    global_network_id = var.global_network.id == null ? awscc_networkmanager_global_network.global_network[0].id : var.global_network.id
     policy_document = var.core_network.policy_document
+
     tags = module.tags.tags
 }
 
