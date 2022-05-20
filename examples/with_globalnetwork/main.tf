@@ -6,12 +6,12 @@ module "cloudwan" {
     id = aws_networkmanager_global_network.global_network.id
   }
   core_network = {
-    description            = "Global Network - AWS CloudWAN Module"
+    description     = "Global Network - AWS CloudWAN Module"
     policy_document = local.policy
   }
 
   tags = {
-      Name = "cloudwan-module-with"
+    Name = "cloudwan-module-with"
   }
 }
 
@@ -20,8 +20,8 @@ resource "aws_networkmanager_global_network" "global_network" {
   description = "Global Network - CloudWAN"
 
   tags = {
-    Name = "Global Network CloudWAN"
+    Name      = "Global Network CloudWAN"
     Terraform = "Managed"
-    Provider = "aws"
+    Provider  = "aws"
   }
 }

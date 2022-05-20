@@ -1,19 +1,19 @@
 # GLOBAL NETWORK - Optionally created if it is not supplied as variable
 resource "awscc_networkmanager_global_network" "global_network" {
-    count = var.global_network.id == null ? 1 : 0
-    
-    description = var.global_network.description
+  count = var.global_network.id == null ? 1 : 0
 
-    tags = module.tags.tags
+  description = var.global_network.description
+
+  tags = module.tags.tags
 }
 
 # CORE NETWORK
 resource "awscc_networkmanager_core_network" "core_network" {
-    description = var.core_network.description
-    global_network_id = var.global_network.id == null ? awscc_networkmanager_global_network.global_network[0].id : var.global_network.id
-    policy_document = var.core_network.policy_document
+  description       = var.core_network.description
+  global_network_id = var.global_network.id == null ? awscc_networkmanager_global_network.global_network[0].id : var.global_network.id
+  policy_document   = jsonencode(jsondecode(var.core_network.policy_document))
 
-    tags = module.tags.tags
+  tags = module.tags.tags
 }
 
 # Sanitizes tags for both aws / awscc providers

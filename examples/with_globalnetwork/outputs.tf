@@ -5,6 +5,6 @@ output "core_network" {
 }
 
 output "global_network" {
-  value = aws_networkmanager_global_network.global_network
+  value       = aws_networkmanager_global_network.global_network
   description = "Global Network - created with AWS provider."
 }

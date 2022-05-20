@@ -6,11 +6,11 @@ module "cloudwan" {
     description = "Global Network - AWS CloudWAN Module"
   }
   core_network = {
-    description            = "Core Network - AWS CloudWAN Module"
+    description     = "Core Network - AWS CloudWAN Module"
     policy_document = local.policy
   }
 
   tags = {
-      Name = "cloudwan-module-without"
+    Name = "cloudwan-module-without"
   }
 }
