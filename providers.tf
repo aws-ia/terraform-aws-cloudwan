@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 0.15.3"
+  required_version = ">= 1.0.7"
   experiments      = [module_variable_optional_attrs]
   required_providers {
     awscc = {
