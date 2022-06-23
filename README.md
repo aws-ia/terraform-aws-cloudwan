@@ -49,14 +49,14 @@ module "cloudwan" {
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.15.3 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0.7 |
 | <a name="requirement_awscc"></a> [awscc](#requirement\_awscc) | >= 0.21.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_awscc"></a> [awscc](#provider\_awscc) | 0.21.0 |
+| <a name="provider_awscc"></a> [awscc](#provider\_awscc) | >= 0.21.0 |
 
 ## Modules
 
@@ -75,8 +75,8 @@ module "cloudwan" {
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_core_network"></a> [core\_network](#input\_core\_network) | Core Network information. | <pre>object({<br>        description = string<br>        policy_document = any<br>    })</pre> | n/a | yes |
-| <a name="input_global_network"></a> [global\_network](#input\_global\_network) | Global Network - if the ID is not provided, the module creates it. | <pre>object({<br>        id = optional(string)<br>        description = optional(string)<br>    })</pre> | n/a | yes |
+| <a name="input_core_network"></a> [core\_network](#input\_core\_network) | Core Network information. | <pre>object({<br>    description     = string<br>    policy_document = any<br>  })</pre> | n/a | yes |
+| <a name="input_global_network"></a> [global\_network](#input\_global\_network) | Global Network - if the ID is not provided, the module creates it. | <pre>object({<br>    id          = optional(string)<br>    description = optional(string)<br>  })</pre> | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to all resources. | `map(string)` | `{}` | no |
 
 ## Outputs

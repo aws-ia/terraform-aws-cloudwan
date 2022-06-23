@@ -1,6 +1,6 @@
 # GLOBAL NETWORK - Optionally created if it is not supplied as variable
 resource "awscc_networkmanager_global_network" "global_network" {
-  count = contains(keys(var.global_network), "id") ? 0 : 1
+  count = var.global_network.id == null ? 1 : 0
 
   description = var.global_network.description
 
@@ -10,7 +10,7 @@ resource "awscc_networkmanager_global_network" "global_network" {
 # CORE NETWORK
 resource "awscc_networkmanager_core_network" "core_network" {
   description       = var.core_network.description
-  global_network_id = contains(keys(var.global_network), "id") ? var.global_network.id : awscc_networkmanager_global_network.global_network[0].id
+  global_network_id = var.global_network.id == null ? awscc_networkmanager_global_network.global_network[0].id : var.global_network.id
   policy_document   = jsonencode(jsondecode(var.core_network.policy_document))
 
   tags = module.tags.tags
