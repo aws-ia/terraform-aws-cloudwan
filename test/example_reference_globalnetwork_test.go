@@ -17,7 +17,7 @@ func TestExamplesWithGlobalNetwork(t *testing.T) {
 	gNId := terraform.Output(t, globalNetworkBase, "global_network_id")
 
 	terraformOptions := &terraform.Options{
-		TerraformDir: "../examples/with_globalnetwork",
+		TerraformDir: "../examples/reference_global_network",
 		Vars: map[string]interface{}{
 			"global_network_id": gNId,
 		},
