@@ -34,17 +34,17 @@ This example creates a Cloud WAN Core Network from scratch, using the Terraform 
 
 | Name | Type |
 |------|------|
-| [aws_networkmanager_global_network.global_network](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/networkmanager_global_network) | resource |
 | [aws_networkmanager_core_network_policy_document.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/networkmanager_core_network_policy_document) | data source |
 
 ## Inputs
 
-No inputs.
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_global_network_id"></a> [global\_network\_id](#input\_global\_network\_id) | ID of the global network to build core network in. | `string` | n/a | yes |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
 | <a name="output_core_network"></a> [core\_network](#output\_core\_network) | Core Network - created with AWS CloudWAN module. |
-| <a name="output_global_network"></a> [global\_network](#output\_global\_network) | Global Network - created with AWS provider. |
 <!-- END_TF_DOCS -->

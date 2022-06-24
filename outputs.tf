@@ -1,6 +1,6 @@
 # GLOBAL NETORK (if created)
 output "global_network" {
-  value       = try(awscc_networkmanager_global_network.global_network[0], null)
+  value       = awscc_networkmanager_core_network.core_network.global_network_id
   description = "Global Network information."
 }
 
