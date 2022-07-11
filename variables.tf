@@ -1,3 +1,9 @@
+variable "create_global_network" {
+  type        = bool
+  description = "(optional) Whether to create the global network or not. Must pass `var.global_network.id` if `false`. Defaults to `true`."
+  default     = true
+}
+
 # Global Network Variables
 variable "global_network" {
   description = "Global Network - if the ID is not provided, the module creates it."

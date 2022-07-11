@@ -123,6 +123,7 @@ data "aws_networkmanager_core_network_policy_document" "main" {
 |------|-------------|------|---------|:--------:|
 | <a name="input_core_network"></a> [core\_network](#input\_core\_network) | Core Network information. | <pre>object({<br>    description     = string<br>    policy_document = any<br>  })</pre> | n/a | yes |
 | <a name="input_global_network"></a> [global\_network](#input\_global\_network) | Global Network - if the ID is not provided, the module creates it. | <pre>object({<br>    id          = optional(string)<br>    description = optional(string)<br>  })</pre> | n/a | yes |
+| <a name="input_create_global_network"></a> [create\_global\_network](#input\_create\_global\_network) | (optional) Whether to create the global network or not. Must pass `var.global_network.id` if `false`. Defaults to `true`. | `bool` | `true` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to all resources. | `map(string)` | `{}` | no |
 
 ## Outputs
