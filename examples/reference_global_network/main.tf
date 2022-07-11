@@ -1,9 +1,12 @@
+resource "awscc_networkmanager_global_network" "test" {}
+
 # Calling the CloudWAN Module
 module "cloudwan" {
   source = "../.."
 
+  create_global_network = false
   global_network = {
-    id = var.global_network_id
+    id = awscc_networkmanager_global_network.test.id
   }
   core_network = {
     description     = "Global Network - AWS CloudWAN Module"

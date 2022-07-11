@@ -9,7 +9,7 @@ import (
 func TestExamplesWithoutGlobalNetwork(t *testing.T) {
 
 	terraformOptions := &terraform.Options{
-		TerraformDir: "../examples/without_globalnetwork",
+		TerraformDir: "../examples/basic",
 	}
 
 	defer terraform.Destroy(t, terraformOptions)
