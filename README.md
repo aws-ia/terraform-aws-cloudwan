@@ -31,6 +31,7 @@ If you already have a Network Manager Global Network created, you can pass the I
 module "cloudwan" {
   source = "aws-ia/cloudwan"
 
+  create_global_network = false
   global_network = {
     id = "global-network-021aedd98c7487b93"
   }
@@ -96,13 +97,13 @@ data "aws_networkmanager_core_network_policy_document" "main" {
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0.7 |
-| <a name="requirement_awscc"></a> [awscc](#requirement\_awscc) | >= 0.21.0 |
+| <a name="requirement_awscc"></a> [awscc](#requirement\_awscc) | >= 0.25.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_awscc"></a> [awscc](#provider\_awscc) | >= 0.21.0 |
+| <a name="provider_awscc"></a> [awscc](#provider\_awscc) | >= 0.25.0 |
 
 ## Modules
 
