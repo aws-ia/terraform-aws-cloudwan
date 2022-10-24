@@ -1,59 +1,33 @@
-resource "awscc_networkmanager_global_network" "test" {}
+# --- examples/reference_global_network/main.tf ---
 
-# Calling the CloudWAN Module
+# Creating Global Network outside the module
+resource "awscc_networkmanager_global_network" "global_network" {
+  description = "Global Network - ${var.identifier}"
+
+  tags = [{
+    Key   = "Name",
+    Value = "Global Network - ${var.identifier}"
+  }]
+}
+
+# AWS Cloud WAN module - creating Core Network
 module "cloudwan" {
   source = "../.."
 
-  create_global_network = false
+  #source = "aws-ia/cloudwan/aws"
+  #version = "0.0.7"
+
   global_network = {
-    id = awscc_networkmanager_global_network.test.id
+    create = false
+    id     = awscc_networkmanager_global_network.global_network.id
   }
+
   core_network = {
     description     = "Global Network - AWS CloudWAN Module"
-    policy_document = data.aws_networkmanager_core_network_policy_document.main.json
+    policy_document = data.aws_networkmanager_core_network_policy_document.policy.json
   }
 
   tags = {
-    Name = "cloudwan-module-with"
-  }
-}
-
-data "aws_networkmanager_core_network_policy_document" "main" {
-  core_network_configuration {
-    vpn_ecmp_support = false
-    asn_ranges       = ["64512-64555"]
-    edge_locations {
-      location = "us-east-1"
-      asn      = 64512
-    }
-  }
-
-  segments {
-    name                          = "shared"
-    description                   = "SegmentForSharedServices"
-    require_attachment_acceptance = true
-  }
-
-  segment_actions {
-    action     = "share"
-    mode       = "attachment-route"
-    segment    = "shared"
-    share_with = ["*"]
-  }
-
-  attachment_policies {
-    rule_number     = 1
-    condition_logic = "or"
-
-    conditions {
-      type     = "tag-value"
-      operator = "equals"
-      key      = "segment"
-      value    = "shared"
-    }
-    action {
-      association_method = "constant"
-      segment            = "shared"
-    }
+    Name = "core-network-${var.identifier}"
   }
 }

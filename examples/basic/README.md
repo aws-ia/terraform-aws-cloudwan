@@ -13,7 +13,7 @@ This example creates a Network Manager Global Network and Cloud WAN Core Network
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0.7 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.9.0 |
 | <a name="requirement_awscc"></a> [awscc](#requirement\_awscc) | >= 0.25.0 |
 
@@ -21,7 +21,7 @@ This example creates a Network Manager Global Network and Cloud WAN Core Network
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.9.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.36.1 |
 
 ## Modules
 
@@ -37,11 +37,14 @@ This example creates a Network Manager Global Network and Cloud WAN Core Network
 
 ## Inputs
 
-No inputs.
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_identifier"></a> [identifier](#input\_identifier) | Example identifier. | `string` | `"create-global-core-network"` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| <a name="output_cloudwan_resources"></a> [cloudwan\_resources](#output\_cloudwan\_resources) | CloudWAN resources created. |
+| <a name="output_core_network_id"></a> [core\_network\_id](#output\_core\_network\_id) | Core Network ID. |
+| <a name="output_global_network_id"></a> [global\_network\_id](#output\_global\_network\_id) | Global Network ID. |
 <!-- END_TF_DOCS -->
