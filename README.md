@@ -5,18 +5,19 @@ This module can be used to deploy an [AWS Cloud WAN](https://docs.aws.amazon.com
 
 ## Usage
 
-The example below builds a Network Manager Global Network and a Cloud WAN Core Network from scratch. The Core Network needs the ID of the Global Network created, and also a policy document (to define the global infrastructure). An example of a policy document can be found [here](https://github.com/aws-ia/terraform-aws-cloudwan/blob/61f2261fc753dca2317b7c8b3973180894d8876e/examples/with_globalnetwork/main.tf#L29-L67).
+The example below builds a Network Manager Global Network and a Cloud WAN Core Network from scratch. The Core Network needs the ID of the Global Network created, and also a policy document (to define the global infrastructure). An example of a policy document can be found [here](https://github.com/aws-ia/terraform-aws-cloudwan/blob/61f2261fc753dca2317b7c8b3973180894d8876e/examples/basic/policy.tf).
 
 ```hcl
 module "cloudwan" {
   source = "aws-ia/cloudwan"
 
   global_network = {
+    create      = true
     description = "Global Network - AWS CloudWAN Module"
   }
   core_network = {
-    description            = "Core Network - AWS CloudWAN Module"
-    policy_document        = data.aws_networkmanager_core_network_policy_document.main.json
+    description     = "Core Network - AWS CloudWAN Module"
+    policy_document = data.aws_networkmanager_core_network_policy_document.main.json
   }
 
   tags = {
@@ -31,13 +32,13 @@ If you already have a Network Manager Global Network created, you can pass the I
 module "cloudwan" {
   source = "aws-ia/cloudwan"
 
-  create_global_network = false
   global_network = {
-    id = "global-network-021aedd98c7487b93"
+    create = false
+    id     = "global-network-021aedd98c7487b93"
   }
   core_network = {
-    description            = "Global Network - AWS CloudWAN Module"
-    policy_document        = data.aws_networkmanager_core_network_policy_document.main.json
+    description     = "Global Network - AWS CloudWAN Module"
+    policy_document = data.aws_networkmanager_core_network_policy_document.main.json
   }
 
   tags = {
@@ -51,10 +52,10 @@ module "cloudwan" {
 Policy documents can be passed as a string of JSON or using the [policy\_document data source](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/networkmanager_core_network_policy_document)
 
 ```terraform
-data "aws_networkmanager_core_network_policy_document" "main" {
+data "aws_networkmanager_core_network_policy_document" "policy" {
   core_network_configuration {
     vpn_ecmp_support = false
-    asn_ranges       = ["64512-64555"]
+    asn_ranges       = ["64512-64520"]
     edge_locations {
       location = "us-east-1"
       asn      = 64512
@@ -96,14 +97,14 @@ data "aws_networkmanager_core_network_policy_document" "main" {
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0.7 |
-| <a name="requirement_awscc"></a> [awscc](#requirement\_awscc) | >= 0.25.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
+| <a name="requirement_awscc"></a> [awscc](#requirement\_awscc) | >= 0.25.0, <= 0.33.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_awscc"></a> [awscc](#provider\_awscc) | >= 0.25.0 |
+| <a name="provider_awscc"></a> [awscc](#provider\_awscc) | >= 0.25.0, <= 0.33.0 |
 
 ## Modules
 
@@ -122,15 +123,14 @@ data "aws_networkmanager_core_network_policy_document" "main" {
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_core_network"></a> [core\_network](#input\_core\_network) | Core Network information. | <pre>object({<br>    description     = string<br>    policy_document = any<br>  })</pre> | n/a | yes |
-| <a name="input_global_network"></a> [global\_network](#input\_global\_network) | Global Network - if the ID is not provided, the module creates it. | <pre>object({<br>    id          = optional(string)<br>    description = optional(string)<br>  })</pre> | n/a | yes |
-| <a name="input_create_global_network"></a> [create\_global\_network](#input\_create\_global\_network) | (optional) Whether to create the global network or not. Must pass `var.global_network.id` if `false`. Defaults to `true`. | `bool` | `true` | no |
+| <a name="input_core_network"></a> [core\_network](#input\_core\_network) | Core Network definition. The following attributes are required:<br>- `description` = (string) Core Network's description.<br>- `description` = (any) Core Network's policy in JSON format. It is recommended the use of the [Core Network Document data source](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/networkmanager_core_network_policy_document)<pre></pre> | <pre>object({<br>    description     = string<br>    policy_document = any<br>  })</pre> | n/a | yes |
+| <a name="input_global_network"></a> [global\_network](#input\_global\_network) | Global Network definition. This variable expects the following attributes:<br>- `create = (Required|string) Indicating if a Global Network should be created or not. Default to `true`.<br>- `id` = (Optional|string) ID of a current Global Network created outside the module. Attribute required when `var.create\_global\_network` is **false**.<br>- `description` = (Optional|string) Description of the new Global Network to create. Attribute required when `var.create\_global\_network` is **true**.<br>`<pre></pre> | <pre>object({<br>    create      = bool<br>    id          = optional(string)<br>    description = optional(string)<br>  })</pre> | <pre>{<br>  "create": true<br>}</pre> | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to all resources. | `map(string)` | `{}` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| <a name="output_core_network"></a> [core\_network](#output\_core\_network) | Core Network information. |
-| <a name="output_global_network"></a> [global\_network](#output\_global\_network) | Global Network information. |
+| <a name="output_core_network"></a> [core\_network](#output\_core\_network) | Core Network. Full output of awscc\_networkmanager\_core\_network. |
+| <a name="output_global_network"></a> [global\_network](#output\_global\_network) | Global Network. Full output of awscc\_networkmanager\_global\_network. |
 <!-- END_TF_DOCS -->
