@@ -2,10 +2,8 @@
 
 # Calling the CloudWAN Module - we are creating both the Global Network and the Core Network
 module "cloudwan" {
-  source = "../.."
-
-  #source = "aws-ia/cloudwan/aws"
-  #version = "0.0.7"
+  source = "aws-ia/cloudwan/aws"
+  version = "0.0.7"
 
   global_network = {
     create      = true

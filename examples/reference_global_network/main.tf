@@ -12,10 +12,8 @@ resource "awscc_networkmanager_global_network" "global_network" {
 
 # AWS Cloud WAN module - creating Core Network
 module "cloudwan" {
-  source = "../.."
-
-  #source = "aws-ia/cloudwan/aws"
-  #version = "0.0.7"
+  source = "aws-ia/cloudwan/aws"
+  version = "0.0.7"
 
   global_network = {
     create = false
