@@ -15,7 +15,7 @@ This example creates a Network Manager Global Network and Cloud WAN Core Network
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.9.0 |
-| <a name="requirement_awscc"></a> [awscc](#requirement\_awscc) | = 0.33.0 |
+| <a name="requirement_awscc"></a> [awscc](#requirement\_awscc) | >= 0.36.0 |
 
 ## Providers
 
@@ -27,7 +27,7 @@ This example creates a Network Manager Global Network and Cloud WAN Core Network
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_cloudwan"></a> [cloudwan](#module\_cloudwan) | ../.. | n/a |
+| <a name="module_cloudwan"></a> [cloudwan](#module\_cloudwan) | aws-ia/cloudwan/aws | 0.0.7 |
 
 ## Resources
 

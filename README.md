@@ -98,13 +98,13 @@ data "aws_networkmanager_core_network_policy_document" "policy" {
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
-| <a name="requirement_awscc"></a> [awscc](#requirement\_awscc) | >= 0.25.0, <= 0.33.0 |
+| <a name="requirement_awscc"></a> [awscc](#requirement\_awscc) | >= 0.36.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_awscc"></a> [awscc](#provider\_awscc) | >= 0.25.0, <= 0.33.0 |
+| <a name="provider_awscc"></a> [awscc](#provider\_awscc) | >= 0.36.0 |
 
 ## Modules
 
