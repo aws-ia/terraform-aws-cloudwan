@@ -1,9 +1,9 @@
 # --- examples/basic/main.tf ---
 
 # Calling the CloudWAN Module - we are creating both the Global Network and the Core Network
-module "cloudwan" {
+module "cloud_wan" {
   source  = "aws-ia/cloudwan/aws"
-  version = "0.0.7"
+  version = "1.0.0"
 
   global_network = {
     create      = true

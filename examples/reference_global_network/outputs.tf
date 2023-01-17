@@ -2,12 +2,12 @@
 
 # Global Network ID
 output "global_network_id" {
-  value       = awscc_networkmanager_global_network.global_network.id
+  value       = aws_networkmanager_global_network.global_network.id
   description = "Global Network ID."
 }
 
 # Core Network ID
 output "core_network_id" {
-  value       = module.cloudwan.core_network.core_network_id
+  value       = module.cloudwan.core_network.id
   description = "Core Network ID."
 }

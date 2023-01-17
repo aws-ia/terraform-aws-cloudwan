@@ -1,23 +1,22 @@
 # --- examples/reference_global_network/main.tf ---
 
 # Creating Global Network outside the module
-resource "awscc_networkmanager_global_network" "global_network" {
+resource "aws_networkmanager_global_network" "global_network" {
   description = "Global Network - ${var.identifier}"
 
-  tags = [{
-    Key   = "Name",
-    Value = "Global Network - ${var.identifier}"
-  }]
+  tags = {
+    Name = "Global Network - ${var.identifier}"
+  }
 }
 
 # AWS Cloud WAN module - creating Core Network
 module "cloudwan" {
   source  = "aws-ia/cloudwan/aws"
-  version = "0.0.7"
+  version = "1.0.0"
 
   global_network = {
     create = false
-    id     = awscc_networkmanager_global_network.global_network.id
+    id     = aws_networkmanager_global_network.global_network.id
   }
 
   core_network = {

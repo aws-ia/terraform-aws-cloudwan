@@ -36,8 +36,8 @@ EOF
 variable "core_network" {
   description = <<-EOF
   Core Network definition. The following attributes are required:
-  - `description` = (string) Core Network's description.
-  - `description` = (any) Core Network's policy in JSON format. It is recommended the use of the [Core Network Document data source](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/networkmanager_core_network_policy_document)
+  - `description`     = (string) Core Network's description.
+  - `policy_document` = (any) Core Network's policy in JSON format. It is recommended the use of the [Core Network Document data source](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/networkmanager_core_network_policy_document)
   ```
 EOF
   type = object({
