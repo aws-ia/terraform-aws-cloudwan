@@ -1,27 +1,31 @@
-# Calling the CloudWAN Module
-module "cloudwan" {
-  source = "../.."
+# --- examples/basic/main.tf ---
+
+# Calling the CloudWAN Module - we are creating both the Global Network and the Core Network
+module "cloud_wan" {
+  source  = "aws-ia/cloudwan/aws"
+  version = "1.0.0"
 
   global_network = {
-    description = "Global Network - AWS CloudWAN Module"
+    create      = true
+    description = "Global Network - ${var.identifier}"
   }
+
   core_network = {
-    description     = "Core Network - AWS CloudWAN Module"
-    policy_document = data.aws_networkmanager_core_network_policy_document.main.json
+    description     = "Core Network - ${var.identifier}"
+    policy_document = data.aws_networkmanager_core_network_policy_document.policy.json
   }
 
   tags = {
-    Name = "cloudwan-module-without"
+    Name = var.identifier
   }
 }
 
-data "aws_networkmanager_core_network_policy_document" "main" {
+data "aws_networkmanager_core_network_policy_document" "policy" {
   core_network_configuration {
     vpn_ecmp_support = false
-    asn_ranges       = ["64512-64555"]
+    asn_ranges       = ["64515-64520"]
     edge_locations {
-      location = "us-east-1"
-      asn      = 64512
+      location = "eu-west-1"
     }
   }
 
@@ -29,28 +33,5 @@ data "aws_networkmanager_core_network_policy_document" "main" {
     name                          = "shared"
     description                   = "SegmentForSharedServices"
     require_attachment_acceptance = true
-  }
-
-  segment_actions {
-    action     = "share"
-    mode       = "attachment-route"
-    segment    = "shared"
-    share_with = ["*"]
-  }
-
-  attachment_policies {
-    rule_number     = 1
-    condition_logic = "or"
-
-    conditions {
-      type     = "tag-value"
-      operator = "equals"
-      key      = "segment"
-      value    = "shared"
-    }
-    action {
-      association_method = "constant"
-      segment            = "shared"
-    }
   }
 }
