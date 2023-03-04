@@ -1,7 +1,7 @@
 <!-- BEGIN_TF_DOCS -->
-# AWS Cloud WAN Module - Example with a Network Manager Global Network created
+# AWS Cloud WAN Module - Example with base\_policy
 
-This example creates a Cloud WAN Core Network from scratch. It supposes that a Network Manager Global Network is already created, so it takes the ID as parameter.
+This example creates a Network Manager Global Network and Cloud WAN Core Network from scratch, using the base\_policy attribute.
 
 ## Usage
 
@@ -20,26 +20,26 @@ This example creates a Cloud WAN Core Network from scratch. It supposes that a N
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.57.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.57.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_cloudwan"></a> [cloudwan](#module\_cloudwan) | aws-ia/cloudwan/aws | 2.0.0 |
+| <a name="module_cloud_wan"></a> [cloud\_wan](#module\_cloud\_wan) | aws-ia/cloudwan/aws | 2.0.0 |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [aws_networkmanager_global_network.global_network](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/networkmanager_global_network) | resource |
 | [aws_networkmanager_core_network_policy_document.policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/networkmanager_core_network_policy_document) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_identifier"></a> [identifier](#input\_identifier) | Example identifier. | `string` | `"reference-global-network"` | no |
+| <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | AWS Region. | `string` | `"eu-west-1"` | no |
+| <a name="input_identifier"></a> [identifier](#input\_identifier) | Example identifier. | `string` | `"base-policy"` | no |
 
 ## Outputs
 
