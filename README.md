@@ -95,7 +95,7 @@ data "aws_networkmanager_core_network_policy_document" "policy" {
 }
 ```
 
-## When do I need to create the *base\_policy*?
+## When do I need to create the *base\_policy*?
 
 You will see that one of the attributes of the Core Network is *base\_policy\_regions*, that it is used in the module to define the *base\_policy* and *base\_policy\_regions* attributes in the `aws_networkmanager_core_network` resource. But... why do we need the *base\_policy*?
 
