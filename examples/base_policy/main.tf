@@ -11,8 +11,9 @@ module "cloud_wan" {
   }
 
   core_network = {
-    description     = "Core Network - ${var.identifier}"
-    policy_document = data.aws_networkmanager_core_network_policy_document.policy.json
+    description         = "Core Network - ${var.identifier}"
+    policy_document     = data.aws_networkmanager_core_network_policy_document.policy.json
+    base_policy_regions = [var.aws_region]
   }
 
   tags = {
@@ -25,7 +26,7 @@ data "aws_networkmanager_core_network_policy_document" "policy" {
     vpn_ecmp_support = false
     asn_ranges       = ["64515-64520"]
     edge_locations {
-      location = "eu-west-1"
+      location = var.aws_region
     }
   }
 

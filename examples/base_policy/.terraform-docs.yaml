@@ -10,7 +10,6 @@ settings:
   required: true
   sensitive: true
   type: true
-  lockfile: false
 
 sort:
   enabled: true

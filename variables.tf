@@ -38,11 +38,13 @@ variable "core_network" {
   Core Network definition. The following attributes are required:
   - `description`     = (string) Core Network's description.
   - `policy_document` = (any) Core Network's policy in JSON format. It is recommended the use of the [Core Network Document data source](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/networkmanager_core_network_policy_document)
+  - `base_policy_regions` = (optional|list(string)) List of AWS Regions to create the base policy in the Core Network. For more information about the need of the base policy, check the README document.
   ```
 EOF
   type = object({
-    description     = string
-    policy_document = any
+    description         = string
+    policy_document     = any
+    base_policy_regions = optional(list(string))
   })
 }
 
@@ -50,5 +52,4 @@ EOF
 variable "tags" {
   description = "Tags to apply to all resources."
   type        = map(string)
-  default     = {}
 }
