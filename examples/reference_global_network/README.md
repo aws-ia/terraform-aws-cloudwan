@@ -26,7 +26,7 @@ This example creates a Cloud WAN Core Network from scratch. It supposes that a N
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_cloudwan"></a> [cloudwan](#module\_cloudwan) | aws-ia/cloudwan/aws | 2.0.0 |
+| <a name="module_cloudwan"></a> [cloudwan](#module\_cloudwan) | ../.. | n/a |
 
 ## Resources
 

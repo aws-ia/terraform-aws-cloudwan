@@ -20,13 +20,13 @@ This example creates a Network Manager Global Network and Cloud WAN Core Network
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.57.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.57.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_cloud_wan"></a> [cloud\_wan](#module\_cloud\_wan) | aws-ia/cloudwan/aws | 2.0.0 |
+| <a name="module_cloud_wan"></a> [cloud\_wan](#module\_cloud\_wan) | ../.. | n/a |
 
 ## Resources
 
