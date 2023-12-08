@@ -1,4 +1,4 @@
-# --- examples/basic/policy.tf ---
+# --- examples/reference_global_network/policy.tf ---
 
 # Core Network policy document - using the data source
 data "aws_networkmanager_core_network_policy_document" "policy" {

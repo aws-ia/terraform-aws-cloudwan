@@ -39,7 +39,7 @@ resource "aws_networkmanager_core_network_policy_attachment" "policy_attachment"
 # ---------- RAM SHARE (CORE NETWORK) ----------
 # RAM Resource Share
 resource "aws_ram_resource_share" "resource_share" {
-  count = local.create_ram_resources ? 1 : 0
+  count = local.create_ram_resources && local.create_core_network ? 1 : 0
 
   name                      = var.core_network.resource_share_name
   allow_external_principals = try(var.core_network.resource_share_allow_external_principals, null)
@@ -60,7 +60,7 @@ resource "aws_ram_resource_association" "resource_association" {
 
 # RAM Principal Association
 resource "aws_ram_principal_association" "principal_association" {
-  count = local.create_ram_resources ? length(try(var.core_network.ram_share_principals), []) : 0
+  count = local.create_ram_resources && local.create_core_network ? length(try(var.core_network.ram_share_principals, [])) : 0
 
   principal          = var.core_network.ram_share_principals[count.index]
   resource_share_arn = aws_ram_resource_share.resource_share[0].arn

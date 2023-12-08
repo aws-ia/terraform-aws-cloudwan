@@ -1,4 +1,4 @@
-# --- examples/basic/variables.tf ---
+# --- examples/base_policy/variables.tf ---
 
 variable "identifier" {
   type        = string
