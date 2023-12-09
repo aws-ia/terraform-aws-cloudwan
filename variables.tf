@@ -1,55 +1,74 @@
 # --- root/variables.tf ---
 
-# Global Network variables
+# ---------- GLOBAL NETWORK ---------
+variable "global_network_id" {
+  type        = string
+  description = "(Optional) Global Network ID. Conflicts with `var.global_network`."
+  default     = null
+}
+
 variable "global_network" {
   description = <<-EOF
-  Global Network definition. This variable expects the following attributes:
-  - `create = (Required|string) Indicating if a Global Network should be created or not. Default to `true`.
-  - `id` = (Optional|string) ID of a current Global Network created outside the module. Attribute required when `var.create_global_network` is **false**.
-  - `description` = (Optional|string) Description of the new Global Network to create. Attribute required when `var.create_global_network` is **true**.
-  ```
+    Global Network definition - providing information to this variable will create a new Global Network. Conflicts with `var.global_network_id`.
+    This variable expects the following attributes:
+    - `description` = (Optional|string) Global Network's description.
+    - `tags`        = (Optional|map(string)) Tags to apply to the Global Network.
+    ```
 EOF
-  type = object({
-    create      = bool
-    id          = optional(string)
-    description = optional(string)
-  })
+  type        = any
+  default     = {}
 
-  default = {
-    create = true
-  }
-
-  # Validates that if the user indicates the creation of the global network (var.global_network.create), it does not pass any id (var.global_network.id)
   validation {
-    condition     = (var.global_network.create && var.global_network.id == null) || (!var.global_network.create && var.global_network.description == null)
-    error_message = "If you select the creation of a new Global Network (var.global_network.create to true), you need to provide a description (var.global_network.description). If not, you need to provide an ID of a current Global Network (var.global_network.id)."
-  }
-
-  # Either var.global_network.id or var.global_network.description has to be defined
-  validation {
-    condition     = var.global_network.id == null || var.global_network.description == null
-    error_message = "Only var.global_network.id or var.global_network.description has to be defined (not both attributes)."
+    error_message = "Only valid key values for var.global_network: \"description\", \"tags\"."
+    condition = length(setsubtract(keys(var.global_network), [
+      "description",
+      "tags"
+    ])) == 0
   }
 }
 
-# Core Network Variables
+# ---------- CORE NETWORK ----------
+variable "core_network_arn" {
+  type        = string
+  description = "(Optional) Core Network ARN. Conflicts with `var.core_network`."
+  default     = null
+}
+
 variable "core_network" {
   description = <<-EOF
-  Core Network definition. The following attributes are required:
-  - `description`     = (string) Core Network's description.
-  - `policy_document` = (any) Core Network's policy in JSON format. It is recommended the use of the [Core Network Document data source](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/networkmanager_core_network_policy_document)
-  - `base_policy_regions` = (optional|list(string)) List of AWS Regions to create the base policy in the Core Network. For more information about the need of the base policy, check the README document.
-  ```
+    Core Network definition - providing information to this variable will create a new Core Network. Conflicts with `var.core_network_arn`.
+    This variable expects the following attributes:
+    - `description`                              = (Optional|string) Core Network's description.
+    - `policy_document`                          = (Optional|any) Core Network's policy in JSON format. It is recommended the use of the [Core Network Document data source](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/networkmanager_core_network_policy_document)
+    - `base_policy_document`                     = (Optional|any) Conflicts with `base_policy_regions`. Sets the base policy document for the Core Network. For more information about the need of the base policy, check the README document.
+    - `base_policy_regions`                      = (Optional|list(string)) Conflicts with `base_policy_document`. List of AWS Regions to create the base policy document in the Core Network. For more information about the need of the base policy, check the README document.
+    - `resource_share_name`                      = (Optional|string) AWS Resource Access Manager (RAM) Resource Share name. Providing this value, RAM resources will be created to share the Core Network with the principals indicated in `var.core_network.ram_share_principals`.
+    - `resource_share_allow_external_principals` = (Optional|bool) Indicates whether principals outside your AWS Organization can be associated with a Resource Share.
+    - `ram_share_principals`                     = (Optional|list(string)) List of principals (AWS Account or AWS Organization) to share the Core Network with.
+    - `tags`                                     = (Optional|map(string)) Tags to apply to the Core Network and RAM Resource Share (if created).
 EOF
-  type = object({
-    description         = string
-    policy_document     = any
-    base_policy_regions = optional(list(string))
-  })
+  type        = any
+  default     = {}
+
+  validation {
+    error_message = "Only valid key values for var.core_network: \"description\", \"policy_document\", \"base_policy_document\", \"base_policy_regions\", \"resource_share_name\", \"resource_share_allow_external_principals\", \"ram_share_principals\", \"tags\"."
+    condition = length(setsubtract(keys(var.core_network), [
+      "description",
+      "policy_document",
+      "base_policy_document",
+      "base_policy_regions",
+      "resource_share_name",
+      "resource_share_allow_external_principals",
+      "ram_share_principals",
+      "tags"
+    ])) == 0
+  }
 }
 
-# Tags
+# ---------- TAGS ----------
 variable "tags" {
-  description = "Tags to apply to all resources."
+  description = "(Optional) Tags to apply to all resources."
   type        = map(string)
+
+  default = {}
 }

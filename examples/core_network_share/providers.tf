@@ -1,4 +1,4 @@
-# --- examples/base_policy/providers.tf ---
+# --- examples/core_network_share/providers.tf ---
 
 terraform {
   required_version = ">= 1.3.0"

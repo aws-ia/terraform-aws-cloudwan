@@ -1,7 +1,7 @@
 <!-- BEGIN_TF_DOCS -->
-# AWS Cloud WAN Module - Example without a Network Manager Global Network created
+# AWS Cloud WAN Module - Sharing Core Network
 
-This example creates a Network Manager Global Network and Cloud WAN Core Network from scratch.
+This example creates an AWS Network Manager Global Network and Core Network from scratch, sharing the Core Network with the AWS Account provided in the `aws_account_share` - we recommend the use of a *terraform.tfvars* file to indicate the AWS Account in your testing environment.
 
 ## Usage
 
@@ -14,13 +14,13 @@ This example creates a Network Manager Global Network and Cloud WAN Core Network
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.57.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.21.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.57.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.21.0 |
 
 ## Modules
 
@@ -38,7 +38,9 @@ This example creates a Network Manager Global Network and Cloud WAN Core Network
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_identifier"></a> [identifier](#input\_identifier) | Example identifier. | `string` | `"create-global-core-network"` | no |
+| <a name="input_aws_account_share"></a> [aws\_account\_share](#input\_aws\_account\_share) | AWS Account ID (to share the Core Network) | `string` | n/a | yes |
+| <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | AWS Region. | `string` | `"eu-west-1"` | no |
+| <a name="input_identifier"></a> [identifier](#input\_identifier) | Example identifier. | `string` | `"core-network-share"` | no |
 
 ## Outputs
 
@@ -46,4 +48,5 @@ This example creates a Network Manager Global Network and Cloud WAN Core Network
 |------|-------------|
 | <a name="output_core_network_id"></a> [core\_network\_id](#output\_core\_network\_id) | Core Network ID. |
 | <a name="output_global_network_id"></a> [global\_network\_id](#output\_global\_network\_id) | Global Network ID. |
+| <a name="output_ram_resource_share"></a> [ram\_resource\_share](#output\_ram\_resource\_share) | AWS RAM Resource Share. |
 <!-- END_TF_DOCS -->

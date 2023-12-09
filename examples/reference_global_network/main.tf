@@ -11,20 +11,20 @@ resource "aws_networkmanager_global_network" "global_network" {
 
 # AWS Cloud WAN module - creating Core Network
 module "cloudwan" {
-  source  = "aws-ia/cloudwan/aws"
-  version = "2.0.0"
+  source = "../.."
 
-  global_network = {
-    create = false
-    id     = aws_networkmanager_global_network.global_network.id
-  }
+  global_network_id = aws_networkmanager_global_network.global_network.id
 
   core_network = {
     description     = "Global Network - AWS CloudWAN Module"
     policy_document = data.aws_networkmanager_core_network_policy_document.policy.json
+
+    tags = {
+      Name = "core-network"
+    }
   }
 
   tags = {
-    Name = "core-network-${var.identifier}"
+    Project = var.identifier
   }
 }

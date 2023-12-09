@@ -1,6 +1,6 @@
-# --- examples/base_policy/main.tf ---
+# --- examples/core_network_share/main.tf ---
 
-# Calling the CloudWAN Module - we are creating both the Global Network and the Core Network
+# AWS Cloud WAN module
 module "cloud_wan" {
   source = "../.."
 
@@ -13,9 +13,12 @@ module "cloud_wan" {
   }
 
   core_network = {
-    description         = "Core Network - ${var.identifier}"
-    policy_document     = data.aws_networkmanager_core_network_policy_document.policy.json
-    base_policy_regions = [var.aws_region]
+    description     = "Core Network - ${var.identifier}"
+    policy_document = data.aws_networkmanager_core_network_policy_document.policy.json
+
+    resource_share_name                      = var.identifier
+    resource_share_allow_external_principals = true
+    ram_share_principals                     = [var.aws_account_share]
 
     tags = {
       Name = "core-network"
