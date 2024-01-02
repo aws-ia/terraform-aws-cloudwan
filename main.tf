@@ -65,3 +65,41 @@ resource "aws_ram_principal_association" "principal_association" {
   principal          = var.core_network.ram_share_principals[count.index]
   resource_share_arn = aws_ram_resource_share.resource_share[0].arn
 }
+
+# ---------- CENTRAL VPCS ----------
+module "central_vpcs" {
+  source   = "aws-ia/vpc/aws"
+  version  = "4.4.1"
+  for_each = try(var.central_vpcs, {})
+
+  name       = try(each.value.name, each.key)
+  cidr_block = try(each.value.cidr_block, null)
+  az_count   = each.value.az_count
+
+  vpc_ipv4_ipam_pool_id   = try(each.value.vpc_ipv4_ipam_pool_id, null)
+  vpc_ipv4_netmask_length = try(each.value.vpc_ipv4_netmask_length, null)
+
+  vpc_enable_dns_hostnames = try(each.value.vpc_enable_dns_hostnames, true)
+  vpc_enable_dns_support   = try(each.value.vpc_enable_dns_support, true)
+  vpc_instance_tenancy     = try(each.value.vpc_instance_tenancy, "default")
+
+  vpc_flow_logs = try(each.value.vpc_flow_logs, { log_destination_type = "none" })
+
+  core_network = {
+    arn = try(aws_networkmanager_core_network.core_network[0].arn, var.core_network_arn)
+    id  = try(aws_networkmanager_core_network.core_network[0].id, split("/", var.core_network_arn)[1])
+  }
+  core_network_routes = each.value.type == "shared_services" ? { for k, v in each.value.subnets : k => "0.0.0.0/0" if k != "public" || k != "core_network" } : local.core_network_routes[each.value.type]
+
+  subnets = merge(
+    local.subnets[each.value.type],
+    { for k, subnet in try(each.value.subnets, {}) : k => merge(try(local.subnets[each.value.type][k], {}), subnet) }
+  )
+
+  tags = merge(
+    module.tags.tags_aws,
+    try(each.value.tags, {})
+  )
+
+  depends_on = [aws_networkmanager_core_network_policy_attachment.policy_attachment]
+}
