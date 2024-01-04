@@ -13,7 +13,6 @@ variable "global_network" {
     This variable expects the following attributes:
     - `description` = (string) Global Network's description.
     - `tags`        = (Optional|map(string)) Tags to apply to the Global Network.
-    ```
 EOF
   type        = any
   default     = {}
@@ -120,6 +119,39 @@ variable "ipv4_network_definition" {
   description = "Definition of the IPv4 CIDR blocks of the AWS network - needed for the VPC routes in Ingress and Egress VPC types. You can specific either a CIDR range or a Prefix List ID."
 
   default = null
+}
+
+# ---------- AWS NETWORK FIREWALL ----------
+variable "aws_network_firewall" {
+  description = <<-EOF
+    AWS Network Firewall configuration. This variable expect a map of Network Firewall definitions to create a firewall resource (and corresponding VPC routing to firewall endpoints) in the corresponding VPC. The central VPC to create the resources is specified by using the same map key as in var.central_vpcs. Resources will be created only in VPC types `inspection`, `egress_with_inspection`, and `ingress_with_inspection`.
+    Each map item expects the following attributes:
+    - `name`                     = (string) Name of the AWS Network Firewall resource.
+    - `description`              = (string) Description of the AWS Network Firewall resource.
+    - `policy_arn`               = (string) ARN of the Network Firewall Policy.
+    - `delete_protection`        = (Optional|bool) Indicates whether it is possible to delete the firewall. Defaults to `false`.
+    - `policy_change_protection` = (Optional|bool) Indicates whether it is possible to change the firewall policy. Defaults to `false`.
+    - `subnet_change_protection` = (Optional|bool) Indicates whether it is possible to change the associated subnet(s) after creation. Defaults to `false`.
+    - `tags`                     = (Optional|map(string)) Tags to apply to the AWS Network Firewall resource.
+EOF
+  type        = any
+  default     = {}
+
+  # Key values for AWS Network Firewall definitions
+  validation {
+    error_message = "Valid key values each AWS Network Firewall definition: \"name\", \"description\", \"policy_arn\", \"delete_protection\", \"policy_change_protection\", \"subnet_change_protection\", \"tags\"."
+    condition = alltrue([
+      for vpc in try(var.aws_network_firewall, {}) : length(setsubtract(keys(vpc), [
+        "name",
+        "description",
+        "policy_arn",
+        "delete_protection",
+        "policy_change_protection",
+        "subnet_change_protection",
+        "tags"
+      ])) == 0
+    ])
+  }
 }
 
 # ---------- TAGS ----------

@@ -23,3 +23,9 @@ output "central_vpcs" {
   value       = try(module.central_vpcs, null)
   description = "Central VPC information. Full output of VPC module - https://registry.terraform.io/modules/aws-ia/vpc/aws/latest."
 }
+
+# AWS NETWORK FIREWALL
+output "aws_network_firewall" {
+  value       = { for k, v in try(module.network_firewall, {}) : k => v.aws_network_firewall }
+  description = "AWS Network Firewall. Full output of aws_networkfirewall_firewall."
+}

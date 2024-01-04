@@ -201,7 +201,7 @@ In addition, additional attributes can be configured for the **core\_network** s
 - `require_acceptance`      = (Optional|bool) Whether the core network VPC attachment requires acceptance or not. Defaults to `false`.
 - `accept_attachment`       = (Optional|bool) Whether the core network VPC attachment is accepted or not in the segment. Only valid if `require_acceptance` is set to `true`. Defaults to `true`.
 
-Regarding the VPC routing, a default route (0.0.0.0/0) is created in the **endpoints** subnet type pointing to the Core Network attachment. Outside of the module is the creation of routing related to the firewall solution created - VPC routes from the *core\_network* subnet type to the firewall endpoints.
+Regarding the VPC routing, a default route (0.0.0.0/0) is created in the **endpoints** route tables pointing to the Core Network attachment.
 
 ```hcl
 module "inspection_vpc" {
@@ -251,7 +251,7 @@ In addition, additional attributes can be configured for both the **public** and
   - `require_acceptance`      = (Optional|bool) Whether the core network VPC attachment requires acceptance or not. Defaults to `false`.
   - `accept_attachment`       = (Optional|bool) Whether the core network VPC attachment is accepted or not in the segment. Only valid if `require_acceptance` is set to `true`. Defaults to `true`.
 
-Regarding the VPC routing, the default configuration of the `connect_to_public_natgw` attribute in the *core\_network* subnet type creates a default route (0.0.0.0/0) from the Core Network subnets to the NAT gateways. The CIDR block or Prefix List defined in `var.ipv4_network_definition` (required in this VPC type) will be used to create a VPC route to the Core Network from the Public subnets.
+Regarding the VPC routing, the default configuration of the `connect_to_public_natgw` attribute in the **core\_network** subnet type creates a default route (0.0.0.0/0) in the route tables to the NAT gateways. The CIDR block or Prefix List defined in `var.ipv4_network_definition` (required in this VPC type) will be used to create a VPC route to the Core Network in the **public** route tables.
 
 ```hcl
 module "egress_vpc" {
@@ -308,9 +308,7 @@ In addition, additional attributes can be configured for the **public**, **endpo
   - `require_acceptance`      = (Optional|bool) Whether the core network VPC attachment requires acceptance or not. Defaults to `false`.
   - `accept_attachment`       = (Optional|bool) Whether the core network VPC attachment is accepted or not in the segment. Only valid if `require_acceptance` is set to `true`. Defaults to `true`.
 
-Regarding the VPC routing, the default configuration of the `connect_to_public_natgw` attribute in the *endpoints* subnet type creates a default route (0.0.0.0/0) from the Endpoint subnets to the NAT gateways. The CIDR block or Prefix List defined in `var.ipv4_network_definition` (required in this VPC type) will be used to create a VPC route to the Core Network from the Endpoint subnets.
-
-Outside of the module is the creation of routing related to the firewall solution created - VPC routes from the *public* and *core\_network* subnet types to the firewall endpoints.
+Regarding the VPC routing, the default configuration of the `connect_to_public_natgw` attribute in the **endpoints** subnet type creates a default route (0.0.0.0/0) in the route tables to the NAT gateways. The CIDR block or Prefix List defined in `var.ipv4_network_definition` (required in this VPC type) will be used to create a VPC route to the Core Network from the **endpoints** route tables.
 
 ```hcl
 module "egress_with_inspection_vpc" {
@@ -362,7 +360,7 @@ In addition, additional attributes can be configured for both the **public** and
   - `require_acceptance`      = (Optional|bool) Whether the core network VPC attachment requires acceptance or not. Defaults to `false`.
   - `accept_attachment`       = (Optional|bool) Whether the core network VPC attachment is accepted or not in the segment. Only valid if `require_acceptance` is set to `true`. Defaults to `true`.
 
-Regarding the VPC routing, the CIDR block or Prefix List defined in `var.ipv4_network_definition` (required in this VPC type) will be used to create a VPC route to the Core Network from the Public subnets.
+Regarding the VPC routing, the CIDR block or Prefix List defined in `var.ipv4_network_definition` (required in this VPC type) will be used to create a VPC route to the Core Network in the **public** route tables.
 
 ```hcl
 module "egress_with_inspection_vpc" {
@@ -392,7 +390,7 @@ module "egress_with_inspection_vpc" {
 }
 ```
 
-### Ingress VPC (with inspection)
+### Ingress VPC (with inspection)
 
 Defining the type **ingress\_with\_inspection** will create specific VPC subnets and routing to create a central Ingress VPC with subnets to add an inspection layer between the Internet gateway and the public subnets - to inspect ingress traffic. When defining the VPC subnets (attribute `subnets`) three keys are mandatory:
 
@@ -417,9 +415,7 @@ In addition, additional attributes can be configured for both the **public** and
   - `require_acceptance`      = (Optional|bool) Whether the core network VPC attachment requires acceptance or not. Defaults to `false`.
   - `accept_attachment`       = (Optional|bool) Whether the core network VPC attachment is accepted or not in the segment. Only valid if `require_acceptance` is set to `true`. Defaults to `true`.
 
-Regarding the VPC routing, the CIDR block or Prefix List defined in `var.ipv4_network_definition` (required in this VPC type) will be used to create a VPC route to the Core Network from the Public subnets.
-
-Outside of the module is the creation of routing related to the firewall solution created - VPC routes from the [Internet gateway](https://aws.amazon.com/blogs/aws/new-vpc-ingress-routing-simplifying-integration-of-third-party-appliances/) and *core\_network* subnet types to the firewall endpoints.
+Regarding the VPC routing, the CIDR block or Prefix List defined in `var.ipv4_network_definition` (required in this VPC type) will be used to create a VPC route to the Core Network in the **public** route tables.
 
 ```hcl
 module "egress_with_inspection_vpc" {
@@ -450,7 +446,7 @@ module "egress_with_inspection_vpc" {
 }
 ```
 
-### Shared Services VPC
+### Shared Services VPC
 
 Defining the type **shared\_services** will create specific VPC subnets and routing to create a central Shared Services VPC. When defining the VPC subnets (attribute `subnets`) the only mandatory key is **core\_network** - to place the Core Network attachment ENIs. When defining the subnets, the following attributes can be configured:
 
@@ -465,7 +461,7 @@ In addition, additional attributes can be configured for both the **core\_networ
 - `require_acceptance`      = (Optional|bool) Whether the core network VPC attachment requires acceptance or not. Defaults to `false`.
 - `accept_attachment`       = (Optional|bool) Whether the core network VPC attachment is accepted or not in the segment. Only valid if `require_acceptance` is set to `true`. Defaults to `true`.
 
-Regarding the VPC routing, a default route (0.0.0.0/0) poiting to the Core Network attachment will be created in any private subnet you create.
+Regarding the VPC routing, a default route (0.0.0.0/0) poiting to the Core Network attachment will be created in any private route table you create.
 
 ```hcl
 module "egress_with_inspection_vpc" {
@@ -494,9 +490,197 @@ module "egress_with_inspection_vpc" {
 }
 ```
 
-## Common questions
+## AWS Network Firewall
 
-### How can I configure tags in the Core Network attachment?
+The variable `var.aws_network_firewall` allows the configuration of [AWS Network Firewall](https://aws.amazon.com/network-firewall/) resources in those central VPCs where inspection can be added - VPC types `inspection`, `egress_with_inspection` and `ingress_with_inspection`. As we use the following [AWS Network Firewall module](https://registry.terraform.io/modules/aws-ia/networkfirewall/aws/latest), the VPC routing pointing to the firewall endpoints is also abstracted.
+
+The variable expects a map containing the Network Firewall configuration to apply in each VPC. How do you make sure the Network Firewall resource (and VPC routing) is created in the corresponding central VPC? By using the same **key value** you used in `var.central_vpcs`. Each map definition expects the following attributes:
+
+- `name`                     = (string) Name of the AWS Network Firewall resource.
+- `description`              = (string) Description of the AWS Network Firewall resource.
+- `policy_arn`               = (string) ARN of the Network Firewall Policy.
+- `delete_protection`        = (Optional|bool) Indicates whether it is possible to delete the firewall. Defaults to `false`.
+- `policy_change_protection` = (Optional|bool) Indicates whether it is possible to change the firewall policy. Defaults to `false`.
+- `subnet_change_protection` = (Optional|bool) Indicates whether it is possible to change the associated subnet(s) after creation. Defaults to `false`.
+- `tags`                     = (Optional|map(string)) Tags to apply to the AWS Network Firewall resource.
+
+### Inspection VPC
+
+If you configure the creation of an AWS Network Firewall resource in an Inspection VPC (type `inspection`), the VPC routes created are the default ones (0.0.0.0/0) pointing to the firewall endpoints in the **core\_network** route tables.
+
+```hcl
+module "cloudwan_central_vpcs" {
+  source  = "aws-ia/cloudwan/aws"
+  version = "3.x.x"
+
+  global_network = {
+    description = "Global Network"
+
+    tags = {
+      Name = "global-network"
+    }
+  }
+
+  core_network = {
+    description     = "Core Network"
+    base_policy_regions = [var.aws_region]
+    policy_document = data.aws_networkmanager_core_network_policy_document.policy.json
+
+    tags = {
+      Name = "core-network"
+    }
+  }
+
+  ipv4_network_definition = "10.0.0.0/8"
+  central_vpcs = {
+    inspection = {
+      type       = "inspection"
+      cidr_block = "10.10.0.0/24"
+      az_count   = 2
+
+      subnets = {
+        endpoints = { netmask = 28 }
+        core_network = {
+          netmask = 28
+
+          tags = { domain = "inspection" }
+        }
+      }
+    }
+  }
+
+  aws_network_firewall = {
+    inspection = {
+      name        = "anfw-inspection"
+      description = "AWS Network Firewall - East/West"
+      policy_arn  = aws_networkfirewall_firewall_policy.policy.arn
+    }
+  }
+}
+```
+
+### Egress VPC
+
+If you configure the creation of an AWS Network Firewall resource in an Egress VPC (type `egress_with_inspection`), the VPC routes created are:
+
+* Default route (0.0.0.0/0) pointing to the firewall endpoints in the **core\_network** route tables.
+* CIDR blocks provided in `var.ipv4_network_definition` pointing to the firewall endpoints in the **public** route tables.
+
+```hcl
+module "cloudwan_central_vpcs" {
+  source  = "aws-ia/cloudwan/aws"
+  version = "3.x.x"
+
+  global_network = {
+    description = "Global Network"
+
+    tags = {
+      Name = "global-network"
+    }
+  }
+
+  core_network = {
+    description     = "Core Network"
+    base_policy_regions = [var.aws_region]
+    policy_document = data.aws_networkmanager_core_network_policy_document.policy.json
+
+    tags = {
+      Name = "core-network"
+    }
+  }
+
+  ipv4_network_definition = "10.0.0.0/8"
+  central_vpcs = {
+    egress-inspection = {
+      type       = "egress_with_inspection"
+      cidr_block = "10.10.0.0/24"
+      az_count   = 2
+
+      subnets = {
+        public    = { netmask = 28 }
+        endpoints = { netmask = 28 }
+        core_network = {
+          netmask = 28
+
+          tags = { domain = "egress" }
+        }
+      }
+    }
+  }
+
+  aws_network_firewall = {
+    egress-inspection = {
+      name        = "anfw-egress-inspection"
+      description = "AWS Network Firewall - Egress"
+      policy_arn  = aws_networkfirewall_firewall_policy.policy.arn
+    }
+  }
+}
+```
+
+### Ingress VPC
+
+If you configure the creation of an AWS Network Firewall resource in an Ingress VPC (type `ingress_with_inspection`), the following resources are created:
+
+* VPC route table associated to the Internet gateway.
+* Public subnet CIDR blocks pointing to the firewall endpoints in the IGW route table.
+* Default route (0.0.0.0/0) pointing to the firewall endpoints in the **public** route tables.
+
+```hcl
+module "cloudwan_central_vpcs" {
+  source  = "aws-ia/cloudwan/aws"
+  version = "3.x.x"
+
+  global_network = {
+    description = "Global Network"
+
+    tags = {
+      Name = "global-network"
+    }
+  }
+
+  core_network = {
+    description     = "Core Network"
+    base_policy_regions = [var.aws_region]
+    policy_document = data.aws_networkmanager_core_network_policy_document.policy.json
+
+    tags = {
+      Name = "core-network"
+    }
+  }
+
+  ipv4_network_definition = "10.0.0.0/8"
+  central_vpcs = {
+    ingress-inspection = {
+      type       = "ingress_with_inspection"
+      cidr_block = "10.10.0.0/24"
+      az_count   = 2
+
+      subnets = {
+        endpoints = { netmask = 28 }
+        public    = { netmask = 28 }
+        core_network = {
+          netmask = 28
+
+          tags = { domain = "ingress" }
+        }
+      }
+    }
+  }
+
+  aws_network_firewall = {
+    ingress-inspection = {
+      name        = "anfw-ingress-inspection"
+      description = "AWS Network Firewall - Ingress"
+      policy_arn  = aws_networkfirewall_firewall_policy.policy.arn
+    }
+  }
+}
+```
+
+## Common questions
+
+### How can I configure tags in the Core Network attachment?
 
 AWS Cloud WAN automates the association of an attachment to a specific segment, reducing the operational overhead specially in multi-Account environments. If you check how to define a [core network policy](https://docs.aws.amazon.com/network-manager/latest/cloudwan/cloudwan-policies-json.html), you will see that the parameter **attachment-policies** is where you can define how to automate the associations. What can you use to define the attachment's association policy? You can use the Resource ID, Account ID, AWS Region, Attachment Type, and **Tags** - which is the common item to use.
 
@@ -552,11 +736,11 @@ If you are creating for the first time the Core Network and the Central VPCs usi
 Error: creating Network Manager VPC (arn:aws:ec2:XXXXXXX-X:XXXXXXX:vpc/vpc-XXXXXXX) Attachment (core-network-XXXXXXX): ValidationException: A live policy was not found
 ```
 
-This error is thrown because when creating the Core Network two resources are created: `aws_networkmanager_core_network` (main resource) and `aws_networkmanager_core_network_policy_attachment` (policy attachment). When creating the VPC attachments, the first resource is the one reference so when it finishes to be created, Terraform will try to create the attachment without waiting for the policy to be LIVE - hence the error. *You won't experience this error if the central VPCs are defined in the same module definition as the Core Network.*
+This error is thrown because when creating the Core Network two resources are created: `aws_networkmanager_core_network` (main resource) and `aws_networkmanager_core_network_policy_attachment` (policy attachment). When creating the VPC attachments, the first resource is the one reference so when it finishes to be created, Terraform will try to create the attachment without waiting for the policy to be LIVE - hence the error.
 
 How to avoid the error? You can do two things:
 
-- If you create the Core Network using this module, but in a separate definition, you can use the [target](https://developer.hashicorp.com/terraform/tutorials/state/resource-targeting) option to create first the Core Network policy attachment resource.
+- If you create the Core Network using this module, you can use the [target](https://developer.hashicorp.com/terraform/tutorials/state/resource-targeting) option to create first the Core Network policy attachment resource.
 - If you create the Core Network using directly the provider resources, you can use a [depends\_on](https://developer.hashicorp.com/terraform/language/meta-arguments/depends_on) argument in the module definition to wait for the policy attachment to be created (LIVE) before start creating the central VPCs.
 
 ### Creating Central VPCs with IPAM configuration - The "for\_each" map includes keys derived from resource attributes that cannot be determined until apply
@@ -591,6 +775,8 @@ As described in the error itself, you first need to create the IPAM pool to then
 | <a name="module_central_vpcs"></a> [central\_vpcs](#module\_central\_vpcs) | aws-ia/vpc/aws | 4.4.1 |
 | <a name="module_core_network_tags"></a> [core\_network\_tags](#module\_core\_network\_tags) | aws-ia/label/aws | 0.0.5 |
 | <a name="module_global_network_tags"></a> [global\_network\_tags](#module\_global\_network\_tags) | aws-ia/label/aws | 0.0.5 |
+| <a name="module_network_firewall"></a> [network\_firewall](#module\_network\_firewall) | aws-ia/networkfirewall/aws | 1.0.0 |
+| <a name="module_public_subnet_cidrs"></a> [public\_subnet\_cidrs](#module\_public\_subnet\_cidrs) | ./modules/subnet_cidrs | n/a |
 | <a name="module_tags"></a> [tags](#module\_tags) | aws-ia/label/aws | 0.0.5 |
 
 ## Resources
@@ -603,15 +789,19 @@ As described in the error itself, you first need to create the IPAM pool to then
 | [aws_ram_principal_association.principal_association](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ram_principal_association) | resource |
 | [aws_ram_resource_association.resource_association](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ram_resource_association) | resource |
 | [aws_ram_resource_share.resource_share](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ram_resource_share) | resource |
+| [aws_route_table.igw_route_table](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) | resource |
+| [aws_route_table_association.igw_route_table_association](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
+| [aws_prefix_list.ipv4_network_definition](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/prefix_list) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_aws_network_firewall"></a> [aws\_network\_firewall](#input\_aws\_network\_firewall) | AWS Network Firewall configuration. This variable expect a map of Network Firewall definitions to create a firewall resource (and corresponding VPC routing to firewall endpoints) in the corresponding VPC. The central VPC to create the resources is specified by using the same map key as in var.central\_vpcs. Resources will be created only in VPC types `inspection`, `egress_with_inspection`, and `ingress_with_inspection`.<br>Each map item expects the following attributes:<br>- `name`                     = (string) Name of the AWS Network Firewall resource.<br>- `description`              = (string) Description of the AWS Network Firewall resource.<br>- `policy_arn`               = (string) ARN of the Network Firewall Policy.<br>- `delete_protection`        = (Optional\|bool) Indicates whether it is possible to delete the firewall. Defaults to `false`.<br>- `policy_change_protection` = (Optional\|bool) Indicates whether it is possible to change the firewall policy. Defaults to `false`.<br>- `subnet_change_protection` = (Optional\|bool) Indicates whether it is possible to change the associated subnet(s) after creation. Defaults to `false`.<br>- `tags`                     = (Optional\|map(string)) Tags to apply to the AWS Network Firewall resource. | `any` | `{}` | no |
 | <a name="input_central_vpcs"></a> [central\_vpcs](#input\_central\_vpcs) | Central VPCs definition. This variable expects a map of VPCs. You can specify the following attributes:<br>- `type`                     = (string) VPC type (`inspection`, `egress`, `egress_with_inspection`, `ingress`, `ingress_with_inspection`, `shared_services`) - each one of them with a specific VPC routing. For more information about the configuration of each VPC type, check the README.<br>- `name`                     = (Optional\|string) Name of the VPC. If not defined, the key of the map will be used.<br>- `cidr_block`               = (Optional\|string) IPv4 CIDR range. **Cannot set if vpc\_ipv4\_ipam\_pool\_id is set.**<br>- `vpc_ipv4_ipam_pool_id`    = (Optional\|string) Set to use IPAM to get an IPv4 CIDR block.  **Cannot set if cidr\_block is set.**<br>- `vpc_ipv4_netmask_length`  = (Optional\|number) Set to use IPAM to get an IPv4 CIDR block using a specified netmask. Must be set with `var.vpc_ipv4_ipam_pool_id`.<br>- `az_count`                 = (number) Searches the number of AZs in the region and takes a slice based on this number - the slice is sorted a-z.<br>- `vpc_enable_dns_hostnames` = (Optional\|bool) Indicates whether the instances launched in the VPC get DNS hostnames. Enabled by default.<br>- `vpc_enable_dns_support`   = (Optional\|bool) Indicates whether the DNS resolution is supported for the VPC. If enabled, queries to the Amazon provided DNS server at the 169.254.169.253 IP address, or the reserved IP address at the base of the VPC network range "plus two" succeed. If disabled, the Amazon provided DNS service in the VPC that resolves public DNS hostnames to IP addresses is not enabled. Enabled by default.<br>- `vpc_instance_tenancy`     = (Optional\|string) The allowed tenancy of instances launched into the VPC.<br>- `vpc_flow_logs`            = (Optional\|object(any)) Configuration of the VPC Flow Logs of the VPC configured. Options: "cloudwatch", "s3", "none".<br>- `subnets`                  = (any) Configuration of the subnets to create in the VPC. Depending the VPC type, the format (subnets to configure and resources created by the module) will be different. Check the README for more information. <br>- `tags`                     = (Optional\|map(string)) Tags to apply to all the Central VPC resources. | `any` | `{}` | no |
 | <a name="input_core_network"></a> [core\_network](#input\_core\_network) | Core Network definition - providing information to this variable will create a new Core Network. Conflicts with `var.core_network_arn`.<br>This variable expects the following attributes:<br>- `description`                              = (string) Core Network's description.<br>- `policy_document`                          = (any) Core Network's policy in JSON format.<br>- `base_policy_document`                     = (Optional\|any) Conflicts with `base_policy_regions`. Sets the base policy document for the Core Network. For more information about the need of the base policy, check the README document.<br>- `base_policy_regions`                      = (Optional\|list(string)) Conflicts with `base_policy_document`. List of AWS Regions to create the base policy document in the Core Network. For more information about the need of the base policy, check the README document.<br>- `resource_share_name`                      = (Optional\|string) AWS Resource Access Manager (RAM) Resource Share name. Providing this value, RAM resources will be created to share the Core Network with the principals indicated in `var.core_network.ram_share_principals`.<br>- `resource_share_allow_external_principals` = (Optional\|bool) Indicates whether principals outside your AWS Organization can be associated with a Resource Share.<br>- `ram_share_principals`                     = (Optional\|list(string)) List of principals (AWS Account or AWS Organization) to share the Core Network with.<br>- `tags`                                     = (Optional\|map(string)) Tags to apply to the Core Network and RAM Resource Share (if created). | `any` | `{}` | no |
 | <a name="input_core_network_arn"></a> [core\_network\_arn](#input\_core\_network\_arn) | (Optional) Core Network ARN. Conflicts with `var.core_network`. | `string` | `null` | no |
-| <a name="input_global_network"></a> [global\_network](#input\_global\_network) | Global Network definition - providing information to this variable will create a new Global Network. Conflicts with `var.global_network_id`.<br>This variable expects the following attributes:<br>- `description` = (string) Global Network's description.<br>- `tags`        = (Optional\|map(string)) Tags to apply to the Global Network.<pre></pre> | `any` | `{}` | no |
+| <a name="input_global_network"></a> [global\_network](#input\_global\_network) | Global Network definition - providing information to this variable will create a new Global Network. Conflicts with `var.global_network_id`.<br>This variable expects the following attributes:<br>- `description` = (string) Global Network's description.<br>- `tags`        = (Optional\|map(string)) Tags to apply to the Global Network. | `any` | `{}` | no |
 | <a name="input_global_network_id"></a> [global\_network\_id](#input\_global\_network\_id) | (Optional) Global Network ID. Conflicts with `var.global_network`. | `string` | `null` | no |
 | <a name="input_ipv4_network_definition"></a> [ipv4\_network\_definition](#input\_ipv4\_network\_definition) | Definition of the IPv4 CIDR blocks of the AWS network - needed for the VPC routes in Ingress and Egress VPC types. You can specific either a CIDR range or a Prefix List ID. | `string` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | (Optional) Tags to apply to all resources. | `map(string)` | `{}` | no |
@@ -620,6 +810,7 @@ As described in the error itself, you first need to create the IPAM pool to then
 
 | Name | Description |
 |------|-------------|
+| <a name="output_aws_network_firewall"></a> [aws\_network\_firewall](#output\_aws\_network\_firewall) | AWS Network Firewall. Full output of aws\_networkfirewall\_firewall. |
 | <a name="output_central_vpcs"></a> [central\_vpcs](#output\_central\_vpcs) | Central VPC information. Full output of VPC module - https://registry.terraform.io/modules/aws-ia/vpc/aws/latest. |
 | <a name="output_core_network"></a> [core\_network](#output\_core\_network) | Core Network. Full output of aws\_networkmanager\_core\_network. |
 | <a name="output_global_network"></a> [global\_network](#output\_global\_network) | Global Network. Full output of aws\_networkmanager\_global\_network. |
