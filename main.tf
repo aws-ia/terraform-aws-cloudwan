@@ -100,6 +100,65 @@ module "central_vpcs" {
     module.tags.tags_aws,
     try(each.value.tags, {})
   )
+}
 
-  depends_on = [aws_networkmanager_core_network_policy_attachment.policy_attachment]
+# ---------- AWS NETWORK FIREWALL ----------
+module "network_firewall" {
+  source  = "aws-ia/networkfirewall/aws"
+  version = "1.0.0"
+  for_each = {
+    for k, v in try(var.central_vpcs, {}) : k => v
+    if contains(["inspection", "egress_with_inspection", "ingress_with_inspection"], v.type) && contains(keys(var.aws_network_firewall), k)
+  }
+
+  network_firewall_name        = var.aws_network_firewall[each.key].name
+  network_firewall_description = var.aws_network_firewall[each.key].description
+  network_firewall_policy      = var.aws_network_firewall[each.key].policy_arn
+
+  network_firewall_delete_protection        = try(var.aws_network_firewall[each.key].delete_protection, false)
+  network_firewall_policy_change_protection = try(var.aws_network_firewall[each.key].policy_change_protection, false)
+  network_firewall_subnet_change_protection = try(var.aws_network_firewall[each.key].subnet_change_protection, false)
+
+  vpc_id      = module.central_vpcs[each.key].vpc_attributes.id
+  vpc_subnets = { for k, v in module.central_vpcs[each.key].private_subnet_attributes_by_az : split("/", k)[1] => v.id if split("/", k)[0] == "endpoints" }
+  number_azs  = each.value.az_count
+
+  routing_configuration = local.routing_configuration[each.key]
+
+  tags = merge(
+    module.tags.tags_aws,
+    try(var.aws_network_firewall[each.key].tags, {})
+  )
+}
+
+# For VPC type "ingress_with_inspection", IGW route table has to be created
+resource "aws_route_table" "igw_route_table" {
+  for_each = {
+    for k, v in module.central_vpcs : k => v
+    if var.central_vpcs[k].type == "ingress_with_inspection"
+  }
+
+  vpc_id = each.value.vpc_attributes.id
+}
+
+resource "aws_route_table_association" "igw_route_table_association" {
+  for_each = {
+    for k, v in module.central_vpcs : k => v
+    if var.central_vpcs[k].type == "ingress_with_inspection"
+  }
+
+  gateway_id     = each.value.internet_gateway.id
+  route_table_id = aws_route_table.igw_route_table[each.key].id
+}
+
+# For VPC type "ingress_with_inspection", we obtain the CIDR blocks of the public subnets
+module "public_subnet_cidrs" {
+  source = "./modules/subnet_cidrs"
+  for_each = {
+    for k, v in module.central_vpcs : k => v
+    if var.central_vpcs[k].type == "ingress_with_inspection"
+  }
+
+  subnet_ids = { for i, j in each.value.public_subnet_attributes_by_az : i => j.id }
+  number_azs = var.central_vpcs[each.key].az_count
 }

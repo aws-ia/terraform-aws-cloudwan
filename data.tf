@@ -53,6 +53,45 @@ locals {
     ingress                 = { public = var.ipv4_network_definition }
     ingress_with_inspection = { public = var.ipv4_network_definition }
   }
+
+  # ---------- AWS NETWORK FIREWALL ROUTING CONFIGURATION ----------
+  routing_configuration = merge(local.routing_configuration_inspection, local.routing_configuration_egress, local.routing_configuration_ingress)
+
+  # Routing configuration - Inspection VPC
+  routing_configuration_inspection = { for k, v in module.central_vpcs : k => {
+    centralized_inspection_without_egress = {
+      connectivity_subnet_route_tables = { for i, j in v.rt_attributes_by_type_by_az.core_network : i => j.id }
+    } }
+    if var.central_vpcs[k].type == "inspection"
+  }
+
+  # Routing configuration - Egress VPC with inspection
+  routing_configuration_egress = { for k, v in module.central_vpcs : k => {
+    centralized_inspection_with_egress = {
+      connectivity_subnet_route_tables = { for i, j in v.rt_attributes_by_type_by_az.core_network : i => j.id }
+      public_subnet_route_tables       = { for i, j in v.rt_attributes_by_type_by_az.public : i => j.id }
+      network_cidr_blocks              = startswith(try(var.ipv4_network_definition, ""), "pl-") ? data.aws_prefix_list.ipv4_network_definition[0].cidr_blocks : [var.ipv4_network_definition]
+    } }
+    if var.central_vpcs[k].type == "egress_with_inspection"
+  }
+
+  # Routing configuration - Ingress VPC with inspection
+  routing_configuration_ingress = { for k, v in module.central_vpcs : k => {
+    single_vpc = {
+      igw_route_table               = aws_route_table.igw_route_table[k].id
+      protected_subnet_route_tables = { for i, j in v.rt_attributes_by_type_by_az.public : i => j.id }
+      protected_subnet_cidr_blocks  = module.public_subnet_cidrs[k].subnet_cidrs
+    } }
+    if var.central_vpcs[k].type == "ingress_with_inspection"
+  }
+}
+
+# ---------- PREFIX LIST TO LIST OF CIDRS ----------
+# For AWS Network Firewall configuration (Egress with Inspection), a list of CIDRs is needed. If the IPv4 Network Definition passed is a prefix list, we need to translate
+data "aws_prefix_list" "ipv4_network_definition" {
+  count = startswith(coalesce(var.ipv4_network_definition, " "), "pl-") ? 1 : 0
+
+  prefix_list_id = var.ipv4_network_definition
 }
 
 # ---------- SANITIZES TAGS ---------
