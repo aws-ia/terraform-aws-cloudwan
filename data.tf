@@ -97,21 +97,21 @@ data "aws_prefix_list" "ipv4_network_definition" {
 # ---------- SANITIZES TAGS ---------
 module "tags" {
   source  = "aws-ia/label/aws"
-  version = "0.0.5"
+  version = "0.0.6"
 
   tags = var.tags
 }
 
 module "global_network_tags" {
   source  = "aws-ia/label/aws"
-  version = "0.0.5"
+  version = "0.0.6"
 
   tags = try(var.global_network.tags, {})
 }
 
 module "core_network_tags" {
   source  = "aws-ia/label/aws"
-  version = "0.0.5"
+  version = "0.0.6"
 
   tags = try(var.core_network.tags, {})
 }

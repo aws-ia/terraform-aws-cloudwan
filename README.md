@@ -773,11 +773,11 @@ As described in the error itself, you first need to create the IPAM pool to then
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_central_vpcs"></a> [central\_vpcs](#module\_central\_vpcs) | aws-ia/vpc/aws | 4.4.1 |
-| <a name="module_core_network_tags"></a> [core\_network\_tags](#module\_core\_network\_tags) | aws-ia/label/aws | 0.0.5 |
-| <a name="module_global_network_tags"></a> [global\_network\_tags](#module\_global\_network\_tags) | aws-ia/label/aws | 0.0.5 |
+| <a name="module_core_network_tags"></a> [core\_network\_tags](#module\_core\_network\_tags) | aws-ia/label/aws | 0.0.6 |
+| <a name="module_global_network_tags"></a> [global\_network\_tags](#module\_global\_network\_tags) | aws-ia/label/aws | 0.0.6 |
 | <a name="module_network_firewall"></a> [network\_firewall](#module\_network\_firewall) | aws-ia/networkfirewall/aws | 1.0.0 |
 | <a name="module_public_subnet_cidrs"></a> [public\_subnet\_cidrs](#module\_public\_subnet\_cidrs) | ./modules/subnet_cidrs | n/a |
-| <a name="module_tags"></a> [tags](#module\_tags) | aws-ia/label/aws | 0.0.5 |
+| <a name="module_tags"></a> [tags](#module\_tags) | aws-ia/label/aws | 0.0.6 |
 
 ## Resources
 
