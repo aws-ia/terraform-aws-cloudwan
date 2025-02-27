@@ -86,7 +86,7 @@ EOF
 
   # Key values for Central VPCs
   validation {
-    error_message = "Valid key values for Central VPCs: \"type\", \"name\", \"cidr_block\", \"az_count\", \"vpc_ipv4_ipam_pool_id\", \"vpc_ipv4_netmask_length\", \"vpc_enable_dns_hostnames\", \"vpc_enable_dns_support\", \"vpc_instance_tenancy\", \"subnets\", \"tags\"."
+    error_message = "Valid key values for Central VPCs: \"type\", \"name\", \"cidr_block\", \"az_count\", \"vpc_ipv4_ipam_pool_id\", \"vpc_ipv4_netmask_length\", \"vpc_enable_dns_hostnames\", \"vpc_enable_dns_support\", \"vpc_instance_tenancy\", \"subnets\", \"vpc_flow_logs\", \"tags\"."
     condition = alltrue([
       for vpc in try(var.central_vpcs, {}) : length(setsubtract(keys(vpc), [
         "type",
@@ -98,6 +98,7 @@ EOF
         "vpc_enable_dns_hostnames",
         "vpc_enable_dns_support",
         "vpc_instance_tenancy",
+        "vpc_flow_logs",
         "subnets",
         "tags"
       ])) == 0
