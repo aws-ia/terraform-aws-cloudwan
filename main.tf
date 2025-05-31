@@ -69,7 +69,7 @@ resource "aws_ram_principal_association" "principal_association" {
 # ---------- CENTRAL VPCS ----------
 module "central_vpcs" {
   source   = "aws-ia/vpc/aws"
-  version  = "4.4.1"
+  version  = "4.4.4"
   for_each = try(var.central_vpcs, {})
 
   name       = try(each.value.name, each.key)
