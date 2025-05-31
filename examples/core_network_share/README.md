@@ -3,6 +3,8 @@
 
 This example creates an AWS Network Manager Global Network and Core Network from scratch, sharing the Core Network with the AWS Account provided in the `aws_account_share` - we recommend the use of a *terraform.tfvars* file to indicate the AWS Account in your testing environment.
 
+**Remember that if you are using the AWS Cloud WAN to share the Core Network, you need to create the resources in us-east-1 (North Virginia)**
+
 ## Usage
 
 - Initialize Terraform using `terraform init`.
@@ -39,7 +41,7 @@ This example creates an AWS Network Manager Global Network and Core Network from
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_aws_account_share"></a> [aws\_account\_share](#input\_aws\_account\_share) | AWS Account ID (to share the Core Network) | `string` | n/a | yes |
-| <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | AWS Region. | `string` | `"eu-west-1"` | no |
+| <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | AWS Region. | `string` | `"us-east-1"` | no |
 | <a name="input_identifier"></a> [identifier](#input\_identifier) | Example identifier. | `string` | `"core-network-share"` | no |
 
 ## Outputs

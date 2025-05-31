@@ -28,7 +28,7 @@ This example creates a Network Manager Global Network and Cloud WAN Core Network
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_cloud_wan"></a> [cloud\_wan](#module\_cloud\_wan) | ../.. | n/a |
-| <a name="module_cloudwan_central_vpcs"></a> [cloudwan\_central\_vpcs](#module\_cloudwan\_central\_vpcs) | ../.. | n/a |
+| <a name="module_cwan_central_vpcs"></a> [cwan\_central\_vpcs](#module\_cwan\_central\_vpcs) | ../.. | n/a |
 
 ## Resources
 
@@ -41,7 +41,7 @@ This example creates a Network Manager Global Network and Cloud WAN Core Network
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | AWS Region. | `string` | `"eu-west-1"` | no |
-| <a name="input_identifier"></a> [identifier](#input\_identifier) | Example identifier. | `string` | `"create-global-core-network"` | no |
+| <a name="input_identifier"></a> [identifier](#input\_identifier) | Example identifier. | `string` | `"central-vpcs"` | no |
 
 ## Outputs
 

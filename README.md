@@ -18,8 +18,6 @@ Following with the **Core Network**, the following attributes can be configured:
 
 - `description`                              = (string) Core Network's description.
 - `policy_document`                          = (any) Core Network's policy in JSON format. It is recommended the use of the [Core Network Document data source](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/networkmanager_core_network_policy_document).
-- `base_policy_document`                     = (Optional|any) Conflicts with `base_policy_regions`. Sets the base policy document for the Core Network. For more information about the need of the base policy, check the [*When do I need to create the base\_policy?*](#when-do-i-need-to-create-the-base\_policy) section below.
-- `base_policy_regions`                      = (Optional|list(string)) Conflicts with `base_policy_document`. List of AWS Regions to create the base policy document in the Core Network. For more information about the need of the base policy, check the [*When do I need to create the base\_policy?*](#when-do-i-need-to-create-the-base\_policy) section below.
 - `resource_share_name`                      = (Optional|string) AWS Resource Access Manager (RAM) Resource Share name. Providing this value, RAM resources will be created to share the Core Network with the principals indicated in `var.core_network.ram_share_principals`.
 - `resource_share_allow_external_principals` = (Optional|bool) Indicates whether principals outside your AWS Organization can be associated with a Resource Share.
 - `ram_share_principals`                     = (Optional|list(string)) List of principals (AWS Account or AWS Organization) to share the Core Network with.
@@ -523,7 +521,6 @@ module "cloudwan_central_vpcs" {
 
   core_network = {
     description     = "Core Network"
-    base_policy_regions = [var.aws_region]
     policy_document = data.aws_networkmanager_core_network_policy_document.policy.json
 
     tags = {
@@ -559,7 +556,7 @@ module "cloudwan_central_vpcs" {
 }
 ```
 
-### Egress VPC
+### Egress VPC
 
 If you configure the creation of an AWS Network Firewall resource in an Egress VPC (type `egress_with_inspection`), the VPC routes created are:
 
@@ -581,7 +578,6 @@ module "cloudwan_central_vpcs" {
 
   core_network = {
     description     = "Core Network"
-    base_policy_regions = [var.aws_region]
     policy_document = data.aws_networkmanager_core_network_policy_document.policy.json
 
     tags = {
@@ -618,7 +614,7 @@ module "cloudwan_central_vpcs" {
 }
 ```
 
-### Ingress VPC
+### Ingress VPC
 
 If you configure the creation of an AWS Network Firewall resource in an Ingress VPC (type `ingress_with_inspection`), the following resources are created:
 
@@ -641,7 +637,6 @@ module "cloudwan_central_vpcs" {
 
   core_network = {
     description     = "Core Network"
-    base_policy_regions = [var.aws_region]
     policy_document = data.aws_networkmanager_core_network_policy_document.policy.json
 
     tags = {
@@ -700,48 +695,7 @@ This module has been created to be used once per AWS Region you are creating res
 
 Coming back to the question, our recommendation is to create the Global Network and Core Network in a different module definition than the Central VPCs - even if the provider you use to create the global resource is also used to create Central VPCs in that same Region. The main reason of the recommendation is to decouple the definition of global and regional resources. That said, if you want to use the same module definition to create global resources and central VPCs in the Region the provider has configured, the module will allow you to do it (and it's not an anti-pattern).
 
-### When do I need to create the *base\_policy*?
-
-You will see two attributes when defining the `var.core_network` variable are *base\_policy\_document* and *base\_policy\_regions*, used in the module to define the *base\_policy*, *base\_policy\_document*, and *base\_policy\_regions* attributes in the `aws_networkmanager_core_network` resource. But... why do we need the *base\_policy*?
-
-First of all, let's start explaining why we use the `aws_networkmanager_core_network_policy_attachment` resource. When adding an inspection layer to AWS Cloud WAN, a static route is needed - from any of the segments pointing to an Inspection VPC. As you need to reference the attachmend ID of the Inspection VPC(s), a circular dependency is created. To avoid this circular dependency, the `aws_networkmanager_core_network_policy_attachment` was created to decouple the creation of the Core Network to the policy document attachment, so when you deploy from scratch your architecture it proceeds as follows:
-
-* Creation of Global Network (if not done already) and Core Network.
-* Creation of Core Network attachments.
-* Attachment of the policy document - generation of the network.
-
-**Important to note** that to get this behaviour you need to use the `aws_networkmanager_core_network_policy_document` data source.
-
-However, there's still one challenge to overcome: you cannot attach resources to the Core Network without an active policy. And it makes sense, as in the policy you indicate the AWS Regions in which you want to create CNEs (Core Network Edges). Without policy, there are no CNEs and it's impossible to attach anything. Here is where *base\_policy* is going to help us: a temporal policy document is generated so the attachments can be created before applying the policy document where you reference some of those attachment IDs.
-
-You have two ways to define the *base\_policy*:
-
-* Use the *base\_policy\_document* argument if you are providing specific configuration on the CNE ASNs in the final policy document you want to deploy.
-* Use the *base\_policy\_regions* argument to simply indicate the AWS Regions where you want to create attachments prior to the deployment of the final policy document.
-
-**What happens when adding new attachments to a current Core Network with a live policy?** If any of these attachmens are referenced in the policy document, those are going to be created first and then the policy is going to be updated. The *base\_policy* attribute won't do anything, as there's a current live policy - we don't need this temporal policy.
-
-**What happens when adding new AWS Regions to a current Core Network with a live policy?** The *base\_policy* won't help us here, as creating a temporal policy with the new AWS Region will create a network disruption - as we already have a network configuration applied. That's why, when adding new AWS Regions, we need a two-step deployment:
-
-* Step 1: Update and apply the policy document with the new AWS Region(s).
-* Step 2: Create the new attachment(s) and update the policy document if any static route is needed.
-
 ## Troubleshooting
-
-### Error: creating Network Manager VPC Attachment: ValidationException: A live policy was not found
-
-If you are creating for the first time the Core Network and the Central VPCs using the module, you will get the following error:
-
-```
-Error: creating Network Manager VPC (arn:aws:ec2:XXXXXXX-X:XXXXXXX:vpc/vpc-XXXXXXX) Attachment (core-network-XXXXXXX): ValidationException: A live policy was not found
-```
-
-This error is thrown because when creating the Core Network two resources are created: `aws_networkmanager_core_network` (main resource) and `aws_networkmanager_core_network_policy_attachment` (policy attachment). When creating the VPC attachments, the first resource is the one reference so when it finishes to be created, Terraform will try to create the attachment without waiting for the policy to be LIVE - hence the error.
-
-How to avoid the error? You can do two things:
-
-- If you create the Core Network using this module, you can use the [target](https://developer.hashicorp.com/terraform/tutorials/state/resource-targeting) option to create first the Core Network policy attachment resource.
-- If you create the Core Network using directly the provider resources, you can use a [depends\_on](https://developer.hashicorp.com/terraform/language/meta-arguments/depends_on) argument in the module definition to wait for the policy attachment to be created (LIVE) before start creating the central VPCs.
 
 ### Creating Central VPCs with IPAM configuration - The "for\_each" map includes keys derived from resource attributes that cannot be determined until apply
 
@@ -799,7 +753,7 @@ As described in the error itself, you first need to create the IPAM pool to then
 |------|-------------|------|---------|:--------:|
 | <a name="input_aws_network_firewall"></a> [aws\_network\_firewall](#input\_aws\_network\_firewall) | AWS Network Firewall configuration. This variable expect a map of Network Firewall definitions to create a firewall resource (and corresponding VPC routing to firewall endpoints) in the corresponding VPC. The central VPC to create the resources is specified by using the same map key as in var.central\_vpcs. Resources will be created only in VPC types `inspection`, `egress_with_inspection`, and `ingress_with_inspection`.<br/>Each map item expects the following attributes:<br/>- `name`                     = (string) Name of the AWS Network Firewall resource.<br/>- `description`              = (string) Description of the AWS Network Firewall resource.<br/>- `policy_arn`               = (string) ARN of the Network Firewall Policy.<br/>- `delete_protection`        = (Optional\|bool) Indicates whether it is possible to delete the firewall. Defaults to `false`.<br/>- `policy_change_protection` = (Optional\|bool) Indicates whether it is possible to change the firewall policy. Defaults to `false`.<br/>- `subnet_change_protection` = (Optional\|bool) Indicates whether it is possible to change the associated subnet(s) after creation. Defaults to `false`.<br/>- `tags`                     = (Optional\|map(string)) Tags to apply to the AWS Network Firewall resource. | `any` | `{}` | no |
 | <a name="input_central_vpcs"></a> [central\_vpcs](#input\_central\_vpcs) | Central VPCs definition. This variable expects a map of VPCs. You can specify the following attributes:<br/>- `type`                     = (string) VPC type (`inspection`, `egress`, `egress_with_inspection`, `ingress`, `ingress_with_inspection`, `shared_services`) - each one of them with a specific VPC routing. For more information about the configuration of each VPC type, check the README.<br/>- `name`                     = (Optional\|string) Name of the VPC. If not defined, the key of the map will be used.<br/>- `cidr_block`               = (Optional\|string) IPv4 CIDR range. **Cannot set if vpc\_ipv4\_ipam\_pool\_id is set.**<br/>- `vpc_ipv4_ipam_pool_id`    = (Optional\|string) Set to use IPAM to get an IPv4 CIDR block.  **Cannot set if cidr\_block is set.**<br/>- `vpc_ipv4_netmask_length`  = (Optional\|number) Set to use IPAM to get an IPv4 CIDR block using a specified netmask. Must be set with `var.vpc_ipv4_ipam_pool_id`.<br/>- `az_count`                 = (number) Searches the number of AZs in the region and takes a slice based on this number - the slice is sorted a-z.<br/>- `vpc_enable_dns_hostnames` = (Optional\|bool) Indicates whether the instances launched in the VPC get DNS hostnames. Enabled by default.<br/>- `vpc_enable_dns_support`   = (Optional\|bool) Indicates whether the DNS resolution is supported for the VPC. If enabled, queries to the Amazon provided DNS server at the 169.254.169.253 IP address, or the reserved IP address at the base of the VPC network range "plus two" succeed. If disabled, the Amazon provided DNS service in the VPC that resolves public DNS hostnames to IP addresses is not enabled. Enabled by default.<br/>- `vpc_instance_tenancy`     = (Optional\|string) The allowed tenancy of instances launched into the VPC.<br/>- `vpc_flow_logs`            = (Optional\|object(any)) Configuration of the VPC Flow Logs of the VPC configured. Options: "cloudwatch", "s3", "none".<br/>- `subnets`                  = (any) Configuration of the subnets to create in the VPC. Depending the VPC type, the format (subnets to configure and resources created by the module) will be different. Check the README for more information. <br/>- `tags`                     = (Optional\|map(string)) Tags to apply to all the Central VPC resources. | `any` | `{}` | no |
-| <a name="input_core_network"></a> [core\_network](#input\_core\_network) | Core Network definition - providing information to this variable will create a new Core Network. Conflicts with `var.core_network_arn`.<br/>This variable expects the following attributes:<br/>- `description`                              = (string) Core Network's description.<br/>- `policy_document`                          = (any) Core Network's policy in JSON format.<br/>- `base_policy_document`                     = (Optional\|any) Conflicts with `base_policy_regions`. Sets the base policy document for the Core Network. For more information about the need of the base policy, check the README document.<br/>- `base_policy_regions`                      = (Optional\|list(string)) Conflicts with `base_policy_document`. List of AWS Regions to create the base policy document in the Core Network. For more information about the need of the base policy, check the README document.<br/>- `resource_share_name`                      = (Optional\|string) AWS Resource Access Manager (RAM) Resource Share name. Providing this value, RAM resources will be created to share the Core Network with the principals indicated in `var.core_network.ram_share_principals`.<br/>- `resource_share_allow_external_principals` = (Optional\|bool) Indicates whether principals outside your AWS Organization can be associated with a Resource Share.<br/>- `ram_share_principals`                     = (Optional\|list(string)) List of principals (AWS Account or AWS Organization) to share the Core Network with.<br/>- `tags`                                     = (Optional\|map(string)) Tags to apply to the Core Network and RAM Resource Share (if created). | `any` | `{}` | no |
+| <a name="input_core_network"></a> [core\_network](#input\_core\_network) | Core Network definition - providing information to this variable will create a new Core Network. Conflicts with `var.core_network_arn`.<br/>This variable expects the following attributes:<br/>- `description`                              = (string) Core Network's description.<br/>- `policy_document`                          = (any) Core Network's policy in JSON format.<br/>- `resource_share_name`                      = (Optional\|string) AWS Resource Access Manager (RAM) Resource Share name. Providing this value, RAM resources will be created to share the Core Network with the principals indicated in `var.core_network.ram_share_principals`.<br/>- `resource_share_allow_external_principals` = (Optional\|bool) Indicates whether principals outside your AWS Organization can be associated with a Resource Share.<br/>- `ram_share_principals`                     = (Optional\|list(string)) List of principals (AWS Account or AWS Organization) to share the Core Network with.<br/>- `tags`                                     = (Optional\|map(string)) Tags to apply to the Core Network and RAM Resource Share (if created). | `any` | `{}` | no |
 | <a name="input_core_network_arn"></a> [core\_network\_arn](#input\_core\_network\_arn) | (Optional) Core Network ARN. Conflicts with `var.core_network`. | `string` | `null` | no |
 | <a name="input_global_network"></a> [global\_network](#input\_global\_network) | Global Network definition - providing information to this variable will create a new Global Network. Conflicts with `var.global_network_id`.<br/>This variable expects the following attributes:<br/>- `description` = (string) Global Network's description.<br/>- `tags`        = (Optional\|map(string)) Tags to apply to the Global Network. | `any` | `{}` | no |
 | <a name="input_global_network_id"></a> [global\_network\_id](#input\_global\_network\_id) | (Optional) Global Network ID. Conflicts with `var.global_network`. | `string` | `null` | no |
