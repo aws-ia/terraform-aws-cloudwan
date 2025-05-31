@@ -4,7 +4,7 @@ variable "identifier" {
   type        = string
   description = "Example identifier."
 
-  default = "create-global-core-network"
+  default = "central-vpcs"
 }
 
 variable "aws_region" {

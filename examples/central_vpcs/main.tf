@@ -1,6 +1,6 @@
 # --- examples/central_vpcs/main.tf ---
 
-# AWS Cloud WAN module - Calling the module first time to create Global Network & Core Network
+# AWS Cloud WAN module
 module "cloud_wan" {
   source = "../.."
 
@@ -22,8 +22,7 @@ module "cloud_wan" {
   }
 }
 
-# AWS Cloud WAN module - Calling the module second time to create Central VPCs (all VPC types)
-module "cloudwan_central_vpcs" {
+module "cwan_central_vpcs" {
   source = "../.."
 
   core_network_arn = module.cloud_wan.core_network.arn

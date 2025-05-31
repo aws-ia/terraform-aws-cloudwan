@@ -19,9 +19,11 @@ resource "aws_networkmanager_core_network" "core_network" {
   description       = var.core_network.description
   global_network_id = local.create_global_network ? aws_networkmanager_global_network.global_network[0].id : var.global_network_id
 
-  create_base_policy   = local.create_base_policy
-  base_policy_document = try(var.core_network.base_policy_document, null)
-  base_policy_regions  = try(var.core_network.base_policy_regions, null)
+  create_base_policy = true
+  base_policy_document = jsonencode({
+    for k, v in jsondecode(var.core_network.policy_document) : k => v
+    if k == "version" || k == "core-network-configuration" || k == "segments"
+  })
 
   tags = merge(
     module.tags.tags_aws,
@@ -69,7 +71,7 @@ resource "aws_ram_principal_association" "principal_association" {
 # ---------- CENTRAL VPCS ----------
 module "central_vpcs" {
   source   = "aws-ia/vpc/aws"
-  version  = "4.4.1"
+  version  = "4.4.4"
   for_each = try(var.central_vpcs, {})
 
   name       = try(each.value.name, each.key)
@@ -105,7 +107,7 @@ module "central_vpcs" {
 # ---------- AWS NETWORK FIREWALL ----------
 module "network_firewall" {
   source  = "aws-ia/networkfirewall/aws"
-  version = "1.0.0"
+  version = "1.0.2"
   for_each = {
     for k, v in try(var.central_vpcs, {}) : k => v
     if contains(["inspection", "egress_with_inspection", "ingress_with_inspection"], v.type) && contains(keys(var.aws_network_firewall), k)

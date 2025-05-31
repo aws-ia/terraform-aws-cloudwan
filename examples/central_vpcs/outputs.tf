@@ -10,5 +10,5 @@ output "cloud_wan" {
 
 output "central_vpcs" {
   description = "Central VPC IDs."
-  value       = { for k, v in module.cloudwan_central_vpcs.central_vpcs : k => v.vpc_attributes.id }
+  value       = { for k, v in module.cwan_central_vpcs.central_vpcs : k => v.vpc_attributes.id }
 }

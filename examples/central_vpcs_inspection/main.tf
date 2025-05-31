@@ -13,9 +13,8 @@ module "cloud_wan" {
   }
 
   core_network = {
-    description         = "Core Network"
-    base_policy_regions = [var.aws_region]
-    policy_document     = data.aws_networkmanager_core_network_policy_document.policy.json
+    description     = "Core Network"
+    policy_document = data.aws_networkmanager_core_network_policy_document.policy.json
 
     tags = {
       Name = "core-network"

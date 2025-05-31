@@ -39,8 +39,6 @@ variable "core_network" {
     This variable expects the following attributes:
     - `description`                              = (string) Core Network's description.
     - `policy_document`                          = (any) Core Network's policy in JSON format.
-    - `base_policy_document`                     = (Optional|any) Conflicts with `base_policy_regions`. Sets the base policy document for the Core Network. For more information about the need of the base policy, check the README document.
-    - `base_policy_regions`                      = (Optional|list(string)) Conflicts with `base_policy_document`. List of AWS Regions to create the base policy document in the Core Network. For more information about the need of the base policy, check the README document.
     - `resource_share_name`                      = (Optional|string) AWS Resource Access Manager (RAM) Resource Share name. Providing this value, RAM resources will be created to share the Core Network with the principals indicated in `var.core_network.ram_share_principals`.
     - `resource_share_allow_external_principals` = (Optional|bool) Indicates whether principals outside your AWS Organization can be associated with a Resource Share.
     - `ram_share_principals`                     = (Optional|list(string)) List of principals (AWS Account or AWS Organization) to share the Core Network with.
@@ -54,8 +52,6 @@ EOF
     condition = length(setsubtract(keys(var.core_network), [
       "description",
       "policy_document",
-      "base_policy_document",
-      "base_policy_regions",
       "resource_share_name",
       "resource_share_allow_external_principals",
       "ram_share_principals",
