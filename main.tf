@@ -45,6 +45,7 @@ resource "aws_ram_resource_share" "resource_share" {
 
   name                      = var.core_network.resource_share_name
   allow_external_principals = try(var.core_network.resource_share_allow_external_principals, null)
+  region                    = local.ram_global_region
 
   tags = merge(
     module.tags.tags_aws,
@@ -58,6 +59,7 @@ resource "aws_ram_resource_association" "resource_association" {
 
   resource_arn       = aws_networkmanager_core_network.core_network[0].arn
   resource_share_arn = aws_ram_resource_share.resource_share[0].arn
+  region             = local.ram_global_region
 }
 
 # RAM Principal Association
@@ -66,6 +68,7 @@ resource "aws_ram_principal_association" "principal_association" {
 
   principal          = var.core_network.ram_share_principals[count.index]
   resource_share_arn = aws_ram_resource_share.resource_share[0].arn
+  region             = local.ram_global_region
 }
 
 # ---------- CENTRAL VPCS ----------
